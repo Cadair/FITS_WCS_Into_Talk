@@ -1,0 +1,63 @@
+* The Flexible Image Transport System File Format
+
+** A Breif History: aka "What do you mean only 8 characters"
+FITS files have existed *since 1979*, with the first (single-HDU) version of the standard being published as a paper in 1981.
+This first version of the standard was endorsed by the International Astronomical Union in 1982.
+
+Each subsequent iteration of the FITS standard has maintained the mantra /"Once FITS, always FITS"/ so each subsequent revision of the standard has to be backwards compatible with the last ones.
+
+** Why Only 8 characters in the keywords?
+
+Well FORTRAN 77 was formally adopted in 1978, one year before the first development of fits files.
+So in a world where you had 8 characters for your variable names, you only needed 8 characters in your files as well.
+
+** Some FITS milestones
+   (adapted from the 4.0 specification)
+
+ -  *1979*: Initial use and interchange of FITS files.
+ -  *1981*: Published original (single HDU) definition paper.
+ -  *1982*: FITS format is formally endorsed by the IAU.
+ -  *1988*: Defined rules for multiple HDUs in a FITS file.
+ -  *1988*: FITS definition extended to include ASCII TABLE extensions.
+ -  *1990*: FITS definition extended to include IEEE floating-point data.
+ -  *1994*: FITS definition extended to multiple image arrays in IMAGE extensions.
+ -  *1995*: FITS definition extended to binary tables in BINTABLE extensions.
+ -  *2000*: Reiterated existing standard in one paper (FITS 2.0).
+ -  *2002*: Approved conventions for generalized world coordinates and celestial coordinates.
+ -  *2005*: Adopted conventions for spectral coordinate systems.
+ -  *2005*: Included 64bit integer type.
+ -  *2008*: FITS 3.0 Adopted by the IAU FITS Working Group.
+ -  *2014*: Adopted proposals for Time coordinates.
+ -  *2016*: FITS 4.0 Adopted by the IAU FITS Working Group, integrated WCS and other conventions into the standard.
+
+   
+** The anatomy of a FITS file
+
+
+   - A FITS file is composed of *one or more* 2880 byte "FITS blocks".
+   - Each file must be an integer multiple of 2880 bytes, there must be nothing between these blocks, they must follow each other.
+   - The first 2880 byte block in the file must contain the start of the Primary HDU (back from when it was the *only* HDU).
+   - Each HDU in the file must consist of at least one 2880 byte block of *header*.
+
+*** FITS File Layout
+
+   +--------------------+ 
+   | PrimaryHDU Block 1 |  2880 bytes
+   +--------------------+
+   ⋮ More Header Blocks  ⋮  N 2880 byte blocks
+   +--------------------+
+   |   Data (optional)  |  N 2880 byte blocks
+   +--------------------+
+   |    HDU2 Block 1    |  2880 bytes
+   +--------------------+
+   ⋮ More Header Blocks  ⋮  N 2880 byte blocks
+   +--------------------+
+   |   Data             |  N 2880 byte blocks
+   ⋮                     ⋮  N 2880 byte blocks
+   +--------------------+
+
+*** A Minimal Single HDU File
+
+#+BEGIN_SRC
+
+#+END_SRC
