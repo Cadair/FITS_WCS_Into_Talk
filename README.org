@@ -1,0 +1,9 @@
+* An Introduction to FITS files and WCS
+
+This is designed to be a technical introduction to what a FITS file is, why people use them.
+In addition to this it also describes the concept of WCS (world coordinate system) and how the FITS-WCS specification works.
+
+
+* License
+
+This repositiory is copyright Stuart Mumford and is licensed under the terms of the [[https://creativecommons.org/licenses/by-sa/4.0/][CC-BY-SA]] license
