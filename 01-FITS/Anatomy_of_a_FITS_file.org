@@ -56,8 +56,52 @@ So in a world where you had 8 characters for your variable names, you only neede
    ⋮                     ⋮  N 2880 byte blocks
    +--------------------+
 
-*** A Minimal Single HDU File
-
-#+BEGIN_SRC
-
+*** A Minimal Single HDU File With Data
+ 
+#+BEGIN_SRC python :session :results output
+  import numpy as np
+  cards = [
+      "SIMPLE  = T",
+      "BITPIX  = -32",
+      "NAXIS   = 2",
+      "NAXIS1  = 10",
+      "NAXIS2  = 10",
+      "END"
+      ]
+  header = "".join([c.ljust(80) for c in cards])
+  header = header.ljust(2880)
+  header = header.encode('ascii')
+  
+  print(header)
+  
+  data = np.zeros((10, 10)).astype(">f")  # Big endian single precision float
+  data = data.tobytes().ljust(2880)
+  
+  with open("test.fits", "wb") as fobj:
+      fobj.write(header)
+      fobj.write(data)
+  
+  from astropy.io import fits
+  hdul = fits.open("test.fits")
+  hdul.info()
+  
+  print(hdul[0].data)
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+b'SIMPLE  = T                                                                     BITPIX  = -32                                                                   NAXIS   = 2                                                                     NAXIS1  = 10                                                                    NAXIS2  = 10                                                                    END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             '
+Filename: test.fits
+No.    Name      Ver    Type      Cards   Dimensions   Format
+  0  PRIMARY       1 PrimaryHDU       5   (10, 10)   float32   
+[[0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]
+#+end_example
