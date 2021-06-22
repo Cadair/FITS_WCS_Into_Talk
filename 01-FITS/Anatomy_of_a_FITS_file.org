@@ -41,24 +41,18 @@ So in a world where you had 8 characters for your variable names, you only neede
 
 *** FITS File Layout
 
-   +--------------------+ 
-   | PrimaryHDU Block 1 |  2880 bytes
-   +--------------------+
-   ⋮ More Header Blocks  ⋮  N 2880 byte blocks
-   +--------------------+
-   |   Data (optional)  |  N 2880 byte blocks
-   +--------------------+
-   |    HDU2 Block 1    |  2880 bytes
-   +--------------------+
-   ⋮ More Header Blocks  ⋮  N 2880 byte blocks
-   +--------------------+
-   |   Data             |  N 2880 byte blocks
-   ⋮                     ⋮  N 2880 byte blocks
-   +--------------------+
+    
+   | *PrimaryHDU Header Block 1*   | 2880 bytes         |
+   | More Header Blocks (optional) | N 2880 byte blocks |
+   | Data (optional)               | N 2880 byte blocks |
+   | ---                           | ---                |
+   | *HDU2 Header Block 1*         | 2880 bytes         |
+   | More Header Blocks (optional) | N 2880 byte blocks |
+   | Data (optional)               | N 2880 byte blocks |
 
 *** A Minimal Single HDU File With Data
  
-#+BEGIN_SRC python :session :results output
+#+BEGIN_SRC python :session fits1 :results output :exports both
   import numpy as np
   cards = [
       "SIMPLE  = T",
@@ -69,18 +63,28 @@ So in a world where you had 8 characters for your variable names, you only neede
       "END"
       ]
   header = "".join([c.ljust(80) for c in cards])
-  header = header.ljust(2880)
+  header = header.ljust(int(np.ceil(len(header) / 2880) * 2880))
   header = header.encode('ascii')
   
   print(header)
+#+END_SRC
+
+#+RESULTS:
+: 2880
+: b'SIMPLE  = T                                                                     BITPIX  = -32                                                                   NAXIS   = 2                                                                     NAXIS1  = 10                                                                    NAXIS2  = 10                                                                    END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             '
   
+#+BEGIN_SRC python :session fits1 :results output :exports code
   data = np.zeros((10, 10)).astype(">f")  # Big endian single precision float
-  data = data.tobytes().ljust(2880)
+  data = data.tobytes().ljust(int(np.ceil(len(data) / 2880) * 2880))
   
   with open("test.fits", "wb") as fobj:
       fobj.write(header)
       fobj.write(data)
+#+END_SRC
+
+#+RESULTS:
   
+#+BEGIN_SRC python :session fits1 :results output :exports both
   from astropy.io import fits
   hdul = fits.open("test.fits")
   hdul.info()
@@ -90,7 +94,6 @@ So in a world where you had 8 characters for your variable names, you only neede
 
 #+RESULTS:
 #+begin_example
-b'SIMPLE  = T                                                                     BITPIX  = -32                                                                   NAXIS   = 2                                                                     NAXIS1  = 10                                                                    NAXIS2  = 10                                                                    END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             '
 Filename: test.fits
 No.    Name      Ver    Type      Cards   Dimensions   Format
   0  PRIMARY       1 PrimaryHDU       5   (10, 10)   float32   
@@ -105,3 +108,22 @@ No.    Name      Ver    Type      Cards   Dimensions   Format
  [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
  [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]
 #+end_example
+
+#+BEGIN_EXAMPLE
+$ fitshdr test.fits 
+================================================================================
+FITS header number 1 at block number 1.
+--------------------------------------------------------------------------------
+SIMPLE  = T
+BITPIX  = -32
+NAXIS   = 2
+NAXIS1  = 10
+NAXIS2  = 10
+END
+--------------------------------------------------------------------------------
+Data section number 1 beginning at block number 2.
+Skipped 1 block of data of size 2880 bytes (2880 bytes).
+================================================================================
+End-of-file after 1 HDU in 2 x 2880-byte blocks (5760 bytes).
+--------------------------------------------------------------------------------
+#+END_EXAMPLE
