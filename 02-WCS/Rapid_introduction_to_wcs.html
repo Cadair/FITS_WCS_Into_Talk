@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>World Coordinate Systems</title>
+<meta name="author" content="(Stuart Mumford)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="../src/reveal.js/dist/reveal.css"/>
+
+<link rel="stylesheet" href="../src/reveal.js/dist/theme/simple.css" id="theme"/>
+
+<link rel="stylesheet" href="../org.css"/>
+<link rel="stylesheet" href="../src/reveal.js/plugin/highlight/monokai.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = '../src/reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide" data-background="../images/background_1.jpg"><h3>World Coordinate Systems</h3>
+<h4>Stuart Mumford</h4>
+</section>
+
+<section>
+<section id="slide-org514ce77" data-background="../images/background_1.jpg">
+<h2 id="org514ce77">WCS means WCS</h2>
+<p>
+World Coordinate Systems map physical (world) coordinates to pixel coordinates.
+</p>
+
+<p>
+The conventions of this system originate from what is now the FITS standard but started as <a href="https://fits.gsfc.nasa.gov/fits_wcs.html">a set of FITS conventions</a>.
+</p>
+
+<p>
+FITS WCS has specific support for celestial (spatial on the sky), spectral, temporal and Stokes polarisation coordinates.
+</p>
+
+<p>
+Critically, the FITS WCS standards describe how to serialise this WCS information into a FITS header.
+</p>
+
+</section>
+<section id="slide-orgf6b688f" data-background="../images/background_1.jpg">
+<h3 id="orgf6b688f">Not FITS WCS</h3>
+<p>
+A quick aside to point out that there are alternative WCS implementations.
+They all share a lot of commonality with what is laid out in the FITS WCS
+standards (in terms of the transformations and mathematics), but they don't
+all serialise to a FITS header.
+</p>
+
+<p>
+This means they can represent more complex multi-stage transforms, and is why
+gWCS and asdf were created at STScI.
+</p>
+
+<p>
+All the calibrated DKIST data products are easily represented in the FITS WCS
+standard. Only DL-NIRSP's raw data would call for something more complex like
+gWCS.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org37d4154" data-background="../images/background_1.jpg">
+<h2 id="org37d4154">Mapping World to Pixel</h2>
+<div class='left'>
+
+<p>
+The stages of the transformation between pixel and world are shown here taken from the first WCS paper.
+</p>
+
+<p>
+This applies to all the coordinate types.
+</p>
+
+
+</div>
+
+<div class='right' style="font-size:60%;">
+
+
+<div id="org8856f9a" class="figure">
+<p><img src="./world_fig1.gif" alt="world_fig1.gif" width="300px" />
+</p>
+</div>
+
+<p>
+Fig 1. Greisen &amp; Calabretta A&amp;A 395, 1061-1075 (2002)
+</p>
+
+</div>
+
+
+</section>
+</section>
+<section>
+<section id="slide-org78199b8" data-background="../images/background_1.jpg">
+<h2 id="org78199b8">The core components of a WCS in a FITS header</h2>
+<p>
+There are a few sets of keys which are required to represent a WCS. Here we list them with some example values for solar celestial coordinates.
+</p>
+
+<p>
+The <code>n</code> index here is the pixel index, all WCSes in FITS must have the same number of world dimensions as there are in the array.
+</p>
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left"><code>CTYPEn</code></td>
+<td class="org-left">HPLN-TAN, HPLT-TAN</td>
+<td class="org-left">The coordinate type</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>CRVALn</code></td>
+<td class="org-left">0, 0</td>
+<td class="org-left">The physical coordinate at the reference pixel</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>CRPIXn</code></td>
+<td class="org-left">2048, 2048</td>
+<td class="org-left">The pixel coordinate of the reference pixel</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>CDELTn</code></td>
+<td class="org-left">0.6, 0.6</td>
+<td class="org-left">The size of the reference coordinate in the world coordinates</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>CUNITn</code></td>
+<td class="org-left">arcsec, arcsec</td>
+<td class="org-left">The units of the world coordinates</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>PCi_j</code></td>
+<td class="org-left">(an identity matrix n x n)</td>
+<td class="org-left">An affine transform matrix to apply to the pixel coordinates</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgb90c335" data-background="../images/background_1.jpg">
+<h2 id="orgb90c335">Celestial Coordinates and Map Projections</h2>
+<div class='left'>
+
+<p>
+The final step of the WCS transform is taking the linearly scaled intermediate coordinates and processing them as world coordinates.
+</p>
+
+<p>
+This is most often seen in solar physics data as a map projection and rotation of the celestial coordinates.
+</p>
+
+
+<div id="org4b5df94" class="figure">
+<p><img src="./celestial_fig_1.gif" alt="celestial_fig_1.gif" width="300px" />
+</p>
+</div>
+
+
+</div>
+
+<div class='right' style="font-size:60%;">
+
+
+<div id="org52e35d6" class="figure">
+<p><img src="./map_projections.png" alt="map_projections.png" height="500px" />
+</p>
+</div>
+
+<p>
+<a href="https://xkcd.com/977/">https://xkcd.com/977/</a>
+</p>
+
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org2518465" data-background="../images/background_1.jpg">
+<h2 id="org2518465">Solar Coordinate Systems: A Lighting Fast Introduction</h2>
+<div class="outline-text-2" id="text-org2518465">
+</div>
+</section>
+<section id="slide-orgbdb16f9" data-background="../images/background_1.jpg">
+<h3 id="orgbdb16f9">Heliographic</h3>
+
+</section>
+<section id="slide-org72edc7a" data-background="../images/background_1.jpg">
+<h3 id="org72edc7a">Heliocentric</h3>
+
+</section>
+<section id="slide-org1379739" data-background="../images/background_1.jpg">
+<h3 id="org1379739">Helioprojective</h3>
+<div class="outline-text-3" id="text-org1379739">
+</div>
+</section>
+<section id="slide-org7394fa1" data-background="../images/background_1.jpg">
+<h4 id="org7394fa1">Helioprojective Cartesian Coordinates and the Small Angle Approximation</h4>
+<p>
+A common misunderstanding amongst solar physicists is that the coordinate system named "Helioprojective Cartesian" isn't actually a Cartesian coordinate system.
+</p>
+
+<p>
+🤦
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="../src/reveal.js/dist/reveal.js"></script>
+<script src="../src/reveal.js/plugin/highlight/highlight.js"></script>
+<script src="../src/reveal.js/plugin/notes/notes.js"></script>
+
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+plugins: [RevealHighlight,RevealNotes],
+hash: true, transition: 'fade',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+]
+});
+
+
+</script>
+</body>
+</html>

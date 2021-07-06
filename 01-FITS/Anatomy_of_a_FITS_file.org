@@ -1,6 +1,22 @@
-* The Flexible Image Transport System File Format
+#+REVEAL_ROOT: ../src/reveal.js/
+#+REVEAL_MATHJAX_URL: ../src/mathjax/es5/tex-chtml.js
+#+REVEAL_HIGHLIGHT_CSS: %r/plugin/highlight/monokai.css
+#+REVEAL_PLUGINS: (highlight notes)
+#+REVEAL_THEME: simple
+#+REVEAL_INIT_OPTIONS: hash: true, transition: 'fade'
+#+REVEAL_DEFAULT_SLIDE_BACKGROUND: ../images/background_1.jpg
+#+REVEAL_TITLE_SLIDE_BACKGROUND: ../images/background_1.jpg
+#+OPTIONS: toc:nil
+#+OPTIONS: num:nil
+#+REVEAL_EXTRA_CSS: ../org.css
 
-** A Breif History: aka "What do you mean only 8 characters"
+#+TITLE: The Flexible Image Transport System File Format
+#+AUTHOR: Stuart Mumford
+#+REVEAL_TITLE_SLIDE: <h3>%t</h3>
+#+REVEAL_TITLE_SLIDE: <h4>%a</h4>
+
+* A Breif History: aka "What do you mean only 8 characters"
+  
 FITS files have existed *since 1979*, with the first (single-HDU) version of the standard being published as a paper in 1981.
 This first version of the standard was endorsed by the International Astronomical Union in 1982.
 
@@ -11,7 +27,7 @@ Each subsequent iteration of the FITS standard has maintained the mantra /"Once 
 Well FORTRAN 77 was formally adopted in 1978, one year before the first development of fits files.
 So in a world where you had 8 characters for your variable names, you only needed 8 characters in your files as well.
 
-** Some FITS milestones
+* Some FITS milestones
    (adapted from the 4.0 specification)
 
  -  *1979*: Initial use and interchange of FITS files.
@@ -31,7 +47,7 @@ So in a world where you had 8 characters for your variable names, you only neede
  -  *2016*: FITS 4.0 Adopted by the IAU FITS Working Group, integrated WCS and other conventions into the standard.
 
    
-** The anatomy of a FITS file
+* The anatomy of a FITS file
 
 
    - A FITS file is composed of *one or more* 2880 byte "FITS blocks".
@@ -39,18 +55,19 @@ So in a world where you had 8 characters for your variable names, you only neede
    - The first 2880 byte block in the file must contain the start of the Primary HDU (back from when it was the *only* HDU).
    - Each HDU in the file must consist of at least one 2880 byte block of *header*.
 
-*** FITS File Layout
+** FITS File Layout
 
     
-   | *PrimaryHDU Header Block 1*   | 2880 bytes         |
-   | More Header Blocks (optional) | N 2880 byte blocks |
-   | Data (optional)               | N 2880 byte blocks |
-   | ---                           | ---                |
-   | *HDU2 Header Block 1*         | 2880 bytes         |
-   | More Header Blocks (optional) | N 2880 byte blocks |
-   | Data (optional)               | N 2880 byte blocks |
+   | *PrimaryHDU Header Block 1*      | 2880 bytes         |
+   | More Header Blocks (optional)    | N 2880 byte blocks |
+   | Data (optional)                  | N 2880 byte blocks |
+   | ---                              | ---                |
+   | *HDU2 Header Block 1* (optional) | 2880 bytes         |
+   | More Header Blocks (optional)    | N 2880 byte blocks |
+   | Data (optional)                  | N 2880 byte blocks |
+   | ...                              | ...                |
 
-*** A FITS Header Card
+** A FITS Header Card
 
     Each header is divided up into 80 character long "cards", these cards contain the keyword, it's value and any comment.
 
@@ -66,7 +83,7 @@ So in a world where you had 8 characters for your variable names, you only neede
 
     If a comment is present it must be proceeded by a ~/~ and that slash *should* be proceeded by a space.
     
-*** A Minimal Single HDU File With Data
+** A Minimal Single HDU File With Data
  
 #+BEGIN_SRC python :session fits1 :results output :exports both
   import numpy as np
@@ -85,10 +102,15 @@ So in a world where you had 8 characters for your variable names, you only neede
   print(header)
 #+END_SRC
 
+*** The Header
+
 #+RESULTS:
 : 2880
 : b'SIMPLE  = T                                                                     BITPIX  = -32                                                                   NAXIS   = 2                                                                     NAXIS1  = 10                                                                    NAXIS2  = 10                                                                    END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             '
-  
+
+
+*** Save the whole file
+    
 #+BEGIN_SRC python :session fits1 :results output :exports code
   data = np.zeros((10, 10)).astype(">f")  # Big endian single precision float
   data = data.tobytes().ljust(int(np.ceil(len(data) / 2880) * 2880))
@@ -125,6 +147,8 @@ No.    Name      Ver    Type      Cards   Dimensions   Format
  [0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]
 #+end_example
 
+*** Reader
+    
 #+BEGIN_EXAMPLE
 $ fitshdr test.fits 
 ================================================================================
