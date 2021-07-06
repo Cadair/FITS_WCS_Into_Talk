@@ -50,6 +50,22 @@ So in a world where you had 8 characters for your variable names, you only neede
    | More Header Blocks (optional) | N 2880 byte blocks |
    | Data (optional)               | N 2880 byte blocks |
 
+*** A FITS Header Card
+
+    Each header is divided up into 80 character long "cards", these cards contain the keyword, it's value and any comment.
+
+    #+BEGIN_EXAMPLE
+    KKKKKKKK=␣VVVVVVVVVVVVVVVVVVVV␣/CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+    |  key |  |     value        |  |               comment                        |
+    #+END_EXAMPLE
+
+    - The first 8 bytes are the keyword
+    - byte 9 is the character ~=~
+    - byte 10 is a space ~␣~
+    - Bytes 11 through 80 are the value and optionally a comment.
+
+    If a comment is present it must be proceeded by a ~/~ and that slash *should* be proceeded by a space.
+    
 *** A Minimal Single HDU File With Data
  
 #+BEGIN_SRC python :session fits1 :results output :exports both
@@ -127,3 +143,4 @@ Skipped 1 block of data of size 2880 bytes (2880 bytes).
 End-of-file after 1 HDU in 2 x 2880-byte blocks (5760 bytes).
 --------------------------------------------------------------------------------
 #+END_EXAMPLE
+
